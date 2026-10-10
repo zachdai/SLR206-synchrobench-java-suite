@@ -30,10 +30,10 @@ public class HandOverHandListIntSet extends AbstractCompositionalIntSet {
 	 */
 	@Override
 	public boolean addInt(int item) {
+		head.lock();
 		Node pred = head;
-		pred.lock();
+		Node curr = pred.next;
 		try {
-			Node curr = pred.next;
 			curr.lock();
 			try {
 				while (curr.key < item) {
@@ -44,12 +44,11 @@ public class HandOverHandListIntSet extends AbstractCompositionalIntSet {
 				}
 				if (curr.key == item) {
 					return false;
-				} else {
-					Node node = new Node(item);
-					node.next = curr;
-					pred.next = node;
-					return true;
 				}
+				Node node = new Node(item);
+				node.next = curr;
+				pred.next = node;
+				return true;
 			} finally {
 				curr.unlock();
 			}
@@ -65,10 +64,10 @@ public class HandOverHandListIntSet extends AbstractCompositionalIntSet {
 	 */
 	@Override
 	public boolean removeInt(int item) {
+		head.lock();
 		Node pred = head;
-		pred.lock();
+		Node curr = pred.next;
 		try {
-			Node curr = pred.next;
 			curr.lock();
 			try {
 				while (curr.key < item) {
@@ -80,9 +79,8 @@ public class HandOverHandListIntSet extends AbstractCompositionalIntSet {
 				if (curr.key == item) {
 					pred.next = curr.next;
 					return true;
-				} else {
-					return false;
 				}
+				return false;
 			} finally {
 				curr.unlock();
 			}
@@ -98,10 +96,10 @@ public class HandOverHandListIntSet extends AbstractCompositionalIntSet {
 	 */
 	@Override
 	public boolean containsInt(int item) {
+		head.lock();
 		Node pred = head;
-		pred.lock();
+		Node curr = pred.next;
 		try {
-			Node curr = pred.next;
 			curr.lock();
 			try {
 				while (curr.key < item) {
@@ -110,11 +108,7 @@ public class HandOverHandListIntSet extends AbstractCompositionalIntSet {
 					curr = pred.next;
 					curr.lock();
 				}
-				if (curr.key == item) {
-					return true;
-				} else {
-					return false;
-				}
+				return (curr.key == item);
 			} finally {
 				curr.unlock();
 			}
